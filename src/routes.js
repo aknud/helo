@@ -1,3 +1,4 @@
+import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import Auth from './component/Auth/Auth';
 import Dashboard from './component/Dashboard/Dashboard';

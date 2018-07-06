@@ -1,16 +1,33 @@
+require('dotenv').config();
 const express = require('express');
+const session = require('express-session');
 const bodyParser = require('body-parser');
 const massive = require('massive');
 const ctrl = require('./controller');
-
-require('dotenv').config();
-const port = 3020;
 const app = express();
+
 app.use(bodyParser.json());
 
-massive(process.env.CONNECTION_STRING).then(db => {
+let {SERVER_PORT, CONNECTION_STRING} = process.env;
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true
+}));
+
+massive(CONNECTION_STRING).then(db => {
     console.log('Database reporting for duty')
     app.set('db', db)
 }).catch(error => console.log('Oi! You\'ve an error!', error))
 
-app.listen(port, () => console.log(`I hear you on ${port}`));
+app.post('/api/auth/register', ctrl.create)
+
+
+
+app.post('/api/logout', (req, res) => {
+    req.session.destroy()
+    res.redirect('http://localhost:3000')
+})
+
+app.listen(SERVER_PORT, () => console.log(`I hear you on ${SERVER_PORT}`));
